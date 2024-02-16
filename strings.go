@@ -4,7 +4,6 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
-	regen "github.com/Broadcom/goregen"
 	"log"
 	"math/rand"
 	"reflect"
@@ -13,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	regen "github.com/Broadcom/goregen"
 
 	util "github.com/Masterminds/goutils"
 )
@@ -120,7 +121,15 @@ func randFromUrlRegex(regexStr string) string {
 
 		randomUrlCharSlice[idx] = 'X'
 		newUrlStr := string(randomUrlCharSlice)
-		if regexMatcher.MatchString(newUrlStr) {
+		matchedStrs := regexMatcher.FindAllString(newUrlStr, -1)
+		fullMatch := false
+		for _, matchedStr := range matchedStrs {
+			if newUrlStr == matchedStr {
+				fullMatch = true
+				break
+			}
+		}
+		if fullMatch {
 			continue
 		}
 

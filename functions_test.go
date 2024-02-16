@@ -141,43 +141,50 @@ func TestRandStringFromRegex(t *testing.T) {
 }
 
 func TestRandStringFromUrlRegex(t *testing.T) {
-	regexStr := `https://(www[.])example[.]com/[a-zA-Z0-9]{9,15}/test@url/[a-e]+/[^/]+$`
-	tmplStr := fmt.Sprintf("{{randFromUrlRegex \"%s\"}}", regexStr)
-	tmpl, err := template.New("randFromUrlRegex").Funcs(FuncMap()).Parse(tmplStr)
-	if err != nil {
-		panic(err)
+	regexStrs := []string{
+		`https://(www[.])example[.]com/[a-zA-Z0-9]{9,15}/test@url/[a-e]+/[^/]+$`,
+		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products(/[^/]+)?`,
+		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products($|(/[^/]+$))`,
 	}
 
-	var buf bytes.Buffer
-	err1 := tmpl.Execute(&buf, nil)
-	if err1 != nil {
-		panic(err1)
-	}
-
-	randomUrl := buf.String()
-	regexMatcher, err2 := regexp.Compile(regexStr)
-	if err2 != nil {
-		panic(err2)
-	}
-
-	matched := regexMatcher.MatchString(randomUrl)
-	if !matched {
-		panic(errors.New("the generated random url does not match the original regular expression"))
-	}
-
-	reservedChars := getIllegalUrlCharMap()
-	runeSlice := []rune(randomUrl)
-	for _, curChar := range runeSlice {
-		if curChar == ':' || curChar == '/' || curChar == '@' {
-			continue
+	for _, regexStr := range regexStrs {
+		tmplStr := fmt.Sprintf("{{randFromUrlRegex \"%s\"}}", regexStr)
+		tmpl, err := template.New("randFromUrlRegex").Funcs(FuncMap()).Parse(tmplStr)
+		if err != nil {
+			panic(err)
 		}
 
-		if _, exists := reservedChars[curChar]; exists {
-			panic(fmt.Sprintf("char [%c] exists in generated random url string", curChar))
+		var buf bytes.Buffer
+		err1 := tmpl.Execute(&buf, nil)
+		if err1 != nil {
+			panic(err1)
 		}
+
+		randomUrl := buf.String()
+		regexMatcher, err2 := regexp.Compile(regexStr)
+		if err2 != nil {
+			panic(err2)
+		}
+
+		matched := regexMatcher.MatchString(randomUrl)
+		if !matched {
+			panic(errors.New("the generated random url does not match the original regular expression"))
+		}
+
+		reservedChars := getIllegalUrlCharMap()
+		runeSlice := []rune(randomUrl)
+		for _, curChar := range runeSlice {
+			if curChar == ':' || curChar == '/' || curChar == '@' {
+				continue
+			}
+
+			if _, exists := reservedChars[curChar]; exists {
+				panic(fmt.Sprintf("char [%c] exists in generated random url string", curChar))
+			}
+		}
+		// Print the generated random string
+		fmt.Println(randomUrl)
 	}
-	// Print the generated random string
-	fmt.Println(randomUrl)
 }
 
 // runt runs a template and checks that the output exactly matches the expected string.
