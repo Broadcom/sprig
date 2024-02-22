@@ -105,6 +105,13 @@ func randFromUrlRegex(regexStr string) string {
 	randomUrl := randFromRegex(regexStr)
 	randomUrlCharSlice := []rune(randomUrl)
 
+	// special handling for non-readable chars
+	for idx, curChar := range randomUrlCharSlice {
+		if curChar < 32 || curChar > 126 {
+			randomUrlCharSlice[idx] = []rune(randAlphaNumeric(1))[0]
+		}
+	}
+
 	// define the reserved chars
 	reservedChars := getIllegalUrlCharMap()
 
