@@ -142,6 +142,7 @@ func TestRandStringFromRegex(t *testing.T) {
 
 func TestRandStringFromUrlRegex(t *testing.T) {
 	regexStrs := []string{
+		`/test/path/.+`,
 		`https://(www[.])example[.]com/[a-zA-Z0-9]{9,15}/test@url/[a-e]+/[^/]+$`,
 		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products(/[^/]+)?`,
 		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products($|(/[^/]+$))`,
