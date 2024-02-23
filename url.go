@@ -99,5 +99,9 @@ func getIllegalUrlCharMap() map[rune]bool {
 		'{':  true,
 		'|':  true,
 		'}':  true,
+		// the following chars will also be removed to keep the random url string more clear
+		'.': true,
+		'-': true,
+		'~': true,
 	}
 }
