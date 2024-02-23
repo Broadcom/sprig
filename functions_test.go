@@ -143,6 +143,7 @@ func TestRandStringFromRegex(t *testing.T) {
 func TestRandStringFromUrlRegex(t *testing.T) {
 	regexStrs := []string{
 		`/test/path/.+`,
+		`/test/[.]/haha/-~/allowed/.*`,
 		`https://(www[.])example[.]com/[a-zA-Z0-9]{9,15}/test@url/[a-e]+/[^/]+$`,
 		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products(/[^/]+)?`,
 		`/directory/v1/customers/[^/?]+/domains/[^/?]+/products($|(/[^/]+$))`,
@@ -175,7 +176,8 @@ func TestRandStringFromUrlRegex(t *testing.T) {
 		reservedChars := getIllegalUrlCharMap()
 		runeSlice := []rune(randomUrl)
 		for _, curChar := range runeSlice {
-			if curChar == ':' || curChar == '/' || curChar == '@' {
+			// the following chars could be explicitly specified in the original regex, swallow the risk if found
+			if curChar == ':' || curChar == '/' || curChar == '@' || curChar == '.' || curChar == '-' || curChar == '~' {
 				continue
 			}
 
